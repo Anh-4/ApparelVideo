@@ -143,6 +143,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         >
           {isGenerating ? 'Đang khởi tạo...' : 'Tạo Video Đơn'}
         </PillButton>
+        <span className="text-[10px] text-white/25 pl-1 pt-1 select-none">v{__APP_VERSION__}</span>
       </div>
     </div>
   );
