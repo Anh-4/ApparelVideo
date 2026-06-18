@@ -25,12 +25,13 @@
 export interface VideoModel { id: string; label: string }
 
 // Map modelDisplayName mà App.tsx truyền vào -> model id Veo.
+// Veo 3 (veo-3.0-*) đã deprecated (tắt 30/06/2026) -> dùng Veo 3.1 (đang hoạt động trên Gemini API).
 export const VIDEO_MODELS: VideoModel[] = [
-  { id: 'veo-3.0-fast-generate-preview', label: 'Omni Flash' }, // nhanh/rẻ hơn
-  { id: 'veo-3.0-generate-preview',      label: 'Omni Pro' },   // chất lượng cao hơn
+  { id: 'veo-3.1-fast-generate-preview', label: 'Omni Flash' }, // nhanh/rẻ hơn
+  { id: 'veo-3.1-generate-preview',      label: 'Omni Pro' },   // chất lượng cao hơn
 ];
 
-const DEFAULT_MODEL_ID = 'veo-3.0-fast-generate-preview';
+const DEFAULT_MODEL_ID = 'veo-3.1-fast-generate-preview';
 const API_ROOT = 'https://generativelanguage.googleapis.com/v1beta';
 
 // Bật/tắt việc gửi ảnh sản phẩm làm ảnh init (image-to-video). Đặt false nếu chỉ muốn
