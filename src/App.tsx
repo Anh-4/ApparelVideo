@@ -5,7 +5,7 @@ import { PreviewArea } from './components/PreviewArea';
 import { OptionsPanel } from './components/OptionsPanel';
 import { GlobalStyles } from './components/GlobalStyles';
 import { ApiKeyModal, hasApiKey } from './components/ApiKeyModal';
-import { STYLE_CONTEXTS, MODEL_CONTEXTS, STYLE_OPTIONS } from './constants';
+import { STYLE_OPTIONS, buildVideoPrompt } from './constants';
 
 export type VideoResult = { base64: string; mimeType: string; mediaId: string; style?: string };
 
@@ -57,10 +57,12 @@ export default function App() {
 
     try {
       const selectedDuration = durationMap[duration] || 8;
-      const stylePrompt = STYLE_CONTEXTS[selectedStyle] || STYLE_CONTEXTS['Street Style'];
-      const modelPrompt = MODEL_CONTEXTS[selectedModel] || MODEL_CONTEXTS['Người mẫu nữ'];
-
-      const prompt = `A cinematic fashion video of ${modelPrompt} wearing a ${category}. Product Details: ${materialDescription}. The ${modelPrompt} is ${stylePrompt} Focus on the premium quality of the product shown in the reference images. 8k, highly detailed, professional color grading.`;
+      const prompt = buildVideoPrompt({
+        styleName: selectedStyle,
+        modelName: selectedModel,
+        categoryVi: category,
+        material: materialDescription,
+      });
 
       const referenceIds = [frontImage.mediaId];
       if (backImage) referenceIds.push(backImage.mediaId);
@@ -92,15 +94,18 @@ export default function App() {
 
     try {
       const selectedDuration = durationMap[duration] || 8;
-      const modelPrompt = MODEL_CONTEXTS[selectedModel] || MODEL_CONTEXTS['Người mẫu nữ'];
       const referenceIds = [frontImage.mediaId];
       if (backImage) referenceIds.push(backImage.mediaId);
 
       // Sinh cả 4 style song song. allSettled: 1 style lỗi không kéo sập cả mẻ.
       const settled = await Promise.allSettled(
         STYLE_OPTIONS.map(async (style) => {
-          const stylePrompt = STYLE_CONTEXTS[style.name];
-          const prompt = `A cinematic fashion video of ${modelPrompt} wearing a ${category}. Product Details: ${materialDescription}. The ${modelPrompt} is ${stylePrompt} Focus on the premium quality of the product shown in the reference images. 8k, highly detailed, professional color grading.`;
+          const prompt = buildVideoPrompt({
+            styleName: style.name,
+            modelName: selectedModel,
+            categoryVi: category,
+            material: materialDescription,
+          });
 
           const result = await Flow.generate.video({
             prompt,
