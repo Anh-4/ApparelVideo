@@ -15,11 +15,10 @@
  *
  * ⚠️ Lưu ý cho Anh4:
  *  - Model id Veo có thể đổi theo thời gian — chỉnh trong VIDEO_MODELS bên dưới nếu API báo 404.
- *  - Veo image-to-video coi ảnh tham chiếu là KHUNG HÌNH ĐẦU (animate từ ảnh đó). Với ảnh sản phẩm
- *    phẳng, kết quả có thể là "animate tấm ảnh sản phẩm" chứ không tự mặc lên người mẫu. Muốn
- *    "người mẫu mặc sản phẩm" chuẩn hơn cần tính năng reference-images của Veo 3.1 (xem USE_IMAGE).
- *  - Veo thường chỉ nhận 1 ảnh init → hiện chỉ dùng ảnh ĐẦU TIÊN (mặt trước). Ảnh mặt sau tạm bỏ qua.
- *  - durationSeconds: tùy phiên bản Veo có thể bị giới hạn/làm tròn (vd Veo 3 hay cố định 8s).
+ *  - Dùng "reference images" (referenceType: 'asset') của Veo 3.1: coi ảnh sản phẩm là CHỦ THỂ
+ *    để đưa vào video (người mẫu MẶC sản phẩm), KHÁC HẲN init frame (animate tấm ảnh phẳng).
+ *  - Veo 3.1 nhận tối đa 3 reference images → gửi cả mặt trước + mặt sau nếu có.
+ *  - Khi dùng reference images, Veo 3.1 ÉP durationSeconds = 8 (giá trị khác sẽ lỗi 400).
  */
 
 export interface VideoModel { id: string; label: string }
@@ -34,8 +33,8 @@ export const VIDEO_MODELS: VideoModel[] = [
 const DEFAULT_MODEL_ID = 'veo-3.1-fast-generate-preview';
 const API_ROOT = 'https://generativelanguage.googleapis.com/v1beta';
 
-// Bật/tắt việc gửi ảnh sản phẩm làm ảnh init (image-to-video). Đặt false nếu chỉ muốn
-// sinh từ text prompt (tránh trường hợp Veo chỉ "animate" tấm ảnh phẳng).
+// Bật/tắt việc gửi ảnh sản phẩm làm reference images (asset). Đặt false nếu chỉ muốn
+// sinh video thuần từ text prompt (không dựa vào ảnh sản phẩm).
 const USE_IMAGE = true;
 
 // Khoảng cách giữa các lần poll + thời gian chờ tối đa.
@@ -124,19 +123,25 @@ async function startVideoOp(opts: {
   key: string;
   aspectRatio?: string;
   durationSeconds?: number;
-  initImage?: { base64: string; mimeType: string };
+  referenceImages?: Array<{ base64: string; mimeType: string }>;
 }): Promise<string> {
   const instance: any = { prompt: opts.prompt };
-  if (opts.initImage) {
-    instance.image = {
-      bytesBase64Encoded: opts.initImage.base64,
-      mimeType: opts.initImage.mimeType,
-    };
+
+  // Reference images (asset): Veo coi ảnh sản phẩm là chủ thể để người mẫu MẶC,
+  // không phải khung hình đầu. Tối đa 3 ảnh (gửi mặt trước + mặt sau).
+  const refs = (opts.referenceImages ?? []).slice(0, 3);
+  if (refs.length) {
+    instance.referenceImages = refs.map((r) => ({
+      image: { bytesBase64Encoded: r.base64, mimeType: r.mimeType },
+      referenceType: 'asset',
+    }));
   }
 
   const parameters: any = { personGeneration: 'allow_adult' };
   if (opts.aspectRatio) parameters.aspectRatio = opts.aspectRatio;
   if (opts.durationSeconds) parameters.durationSeconds = opts.durationSeconds;
+  // Veo 3.1 chỉ cho durationSeconds = 8 khi có reference images -> ép 8 để tránh lỗi 400.
+  if (refs.length) parameters.durationSeconds = 8;
 
   const res = await fetch(
     withKey(`${API_ROOT}/models/${opts.model}:predictLongRunning`, opts.key),
@@ -226,12 +231,14 @@ export const Flow = {
       const key = getApiKey();
       const model = resolveModelId(opts.modelDisplayName);
 
-      // Veo chỉ nhận 1 ảnh init -> dùng ảnh đầu tiên (mặt trước) nếu có và USE_IMAGE bật.
-      let initImage: { base64: string; mimeType: string } | undefined;
+      // Gom tất cả ảnh sản phẩm (mặt trước + mặt sau) làm reference images, tối đa 3.
+      let referenceImages: Array<{ base64: string; mimeType: string }> | undefined;
       if (USE_IMAGE) {
-        const firstId = opts.referenceImageMediaIds?.[0];
-        const m = firstId ? registry.get(firstId) : undefined;
-        if (m) initImage = { base64: m.base64, mimeType: m.mimeType };
+        const refs = (opts.referenceImageMediaIds ?? [])
+          .map((id) => registry.get(id))
+          .filter((m): m is { base64: string; mimeType: string } => !!m)
+          .map((m) => ({ base64: m.base64, mimeType: m.mimeType }));
+        if (refs.length) referenceImages = refs;
       }
 
       const name = await startVideoOp({
@@ -240,7 +247,7 @@ export const Flow = {
         key,
         aspectRatio: opts.aspectRatio,
         durationSeconds: opts.durationSeconds,
-        initImage,
+        referenceImages,
       });
 
       const resp = await pollVideoOp(name, key);
