@@ -54,12 +54,12 @@ export function buildVideoPrompt(opts: {
   return [
     // 1) Độ chân thực + máy quay (giảm cảm giác "AI/CGI")
     'Photorealistic high-fashion film shot on a professional cinema camera with an 85mm lens, real camera footage, ultra-detailed and lifelike, natural film look — not CGI, not animated, not a cartoon.',
-    // 2) Chủ thể + trang phục
-    `Subject: ${model} ${wardrobe}, with natural realistic facial features and authentic skin texture.`,
+    // 2) Chủ thể + trang phục: MẶC ĐỦ, không thiếu đồ (vd thiếu quần)
+    `Subject: ${model}, with a natural realistic face and body and authentic lifelike skin texture, ${wardrobe} as the featured hero piece, fully styled with well-fitted complementary clothing and footwear so the outfit is always complete — fully and modestly dressed, never missing any garment.`,
     // 3) Hành động / bối cảnh theo phong cách
     `Action: the model is ${scene}`,
-    // 4) Trung thành với sản phẩm (giữ đúng màu/logo/họa tiết)
-    'The outfit fits and drapes naturally; fabric folds and the printed design move realistically and stay faithful to the garment in the reference image — keep colors, logos and patterns accurate and clearly visible.',
+    // 4) NGUYÊN TẮC DUY NHẤT: giữ nguyên design mặt trước & sau; còn lại AI tự do sáng tạo
+    'Most important rule: the featured garment design must exactly match the reference images — keep the FRONT and BACK artwork, prints, graphics, text, logos, colors and patterns identical, and do not change, add, remove, distort or recolor any design element. Everything else — the model, the rest of the outfit, pose, scenery and background — can be freely and creatively imagined and look natural, as long as the featured garment design stays faithful. The garment fits and drapes naturally and its print moves realistically with the fabric.',
     // 5) Ánh sáng & màu: SÁNG, rõ, sống động nhưng vẫn tự nhiên
     'Bright, clean and well-exposed with abundant flattering light; vibrant yet true-to-life colors, accurate white balance, luminous natural lighting and soft gentle shadows, radiant healthy skin tones; crisp sharp focus, shallow depth of field, smooth steady camera. Avoid dark, murky, underexposed, dull or washed-out tones; no heavy filter, no oversaturation.'
   ].join(' ');
