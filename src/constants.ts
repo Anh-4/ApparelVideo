@@ -51,10 +51,10 @@ export function buildVideoPrompt(opts: {
     : `wearing a ${garment}`;
 
   return [
-    'Cinematic fashion film, professional fashion cinematography, 4K.',
+    'Photorealistic fashion film, real camera footage, high quality, sharp 4K detail, true to life.',
     `Subject: ${model} ${wardrobe}.`,
     `Action: the model is ${scene}`,
     "The outfit fits and drapes naturally; fabric folds and the printed design move realistically and stay faithful to the garment shown in the reference image — keep colors, logos and patterns accurate.",
-    'Smooth steady camera, shallow depth of field, cinematic color grading, natural skin tones, realistic lighting.'
+    'Natural true-to-life colors with accurate white balance, realistic ambient lighting and soft natural shadows, neutral color grade with no heavy filter and no over-saturation, true-to-life skin tones, shallow depth of field, smooth steady camera.'
   ].join(' ');
 }
