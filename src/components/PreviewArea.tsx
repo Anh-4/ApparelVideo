@@ -62,6 +62,13 @@ export const PreviewArea: React.FC<PreviewAreaProps> = ({ videoResult, comboResu
     <div className="flex-1 relative flex items-center justify-center p-6 overflow-hidden">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.03)_0%,transparent_70%)] pointer-events-none" />
 
+      {/* Banner lỗi/cảnh báo: hiện ở MỌI trạng thái (kể cả khi combo có kết quả) để không che mất message như "Đã tạo 3/4". */}
+      {error && (videoResult || comboResults || isGenerating) && (
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-30 max-w-md w-[90%] px-4 py-2.5 rounded-xl bg-red-500/15 border border-red-500/30 text-red-300 text-[12px] text-center backdrop-blur-md shadow-lg">
+          {error}
+        </div>
+      )}
+
       {comboResults ? (
         <div className="grid grid-cols-2 gap-4 w-full h-full max-w-5xl max-h-[85vh]">
           {comboResults.map((v, i) => renderVideo(v, `combo-${i}`, true))}

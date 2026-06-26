@@ -15,6 +15,8 @@ interface SidebarProps {
   setDuration: (val: string) => void;
   aspectRatio: '9:16' | '16:9';
   setAspectRatio: (val: '9:16' | '16:9') => void;
+  videoModel: string;
+  setVideoModel: (val: string) => void;
   onGenerate: () => void;
   onGenerateCombo: () => void;
   isGenerating: boolean;
@@ -27,6 +29,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   category, setCategory,
   duration, setDuration,
   aspectRatio, setAspectRatio,
+  videoModel, setVideoModel,
   onGenerate, onGenerateCombo, isGenerating
 }) => {
   const handleSelectImage = async (type: 'front' | 'back') => {
@@ -100,16 +103,25 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <div className="flex flex-col gap-3 w-full">
             <div className="flex flex-col gap-1">
               <span className="text-[10px] text-white/40 ml-1">Thời lượng</span>
-              <SegmentedToggle
-                value={duration}
-                onChange={setDuration}
-                items={[
-                  { value: '4s', label: '4s' },
-                  { value: '6s', label: '6s' },
-                  { value: '8s', label: '8s' },
-                  { value: '10s', label: '10s' },
-                ]}
-              />
+              {frontImage ? (
+                // Có ảnh SP -> Veo 3.1 ép durationSeconds = 8 (giá trị khác sẽ lỗi 400),
+                // nên khoá hiển thị 8s để không gây hiểu nhầm là chọn được.
+                <div className="flex items-center gap-1.5 h-[36px] px-3 rounded-xl border border-[#595959] bg-white/5 text-[11px] text-white/55 select-none">
+                  <span className="material-symbols-outlined text-[15px] text-white/40">lock</span>
+                  8 giây — Veo cố định khi có ảnh SP
+                </div>
+              ) : (
+                <SegmentedToggle
+                  value={duration}
+                  onChange={setDuration}
+                  items={[
+                    { value: '4s', label: '4s' },
+                    { value: '6s', label: '6s' },
+                    { value: '8s', label: '8s' },
+                    { value: '10s', label: '10s' },
+                  ]}
+                />
+              )}
             </div>
             <div className="flex flex-col gap-1">
               <span className="text-[10px] text-white/40 ml-1">Tỷ lệ khung hình</span>
@@ -121,6 +133,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   { value: '16:9', label: '16:9' },
                 ]}
               />
+            </div>
+            <div className="flex flex-col gap-1">
+              <span className="text-[10px] text-white/40 ml-1">Chất lượng</span>
+              <SegmentedToggle
+                value={videoModel}
+                onChange={setVideoModel}
+                items={[
+                  { value: 'Omni Flash', label: 'Flash · Nhanh' },
+                  { value: 'Omni Pro', label: 'Pro · Đẹp' },
+                ]}
+              />
+              <span className="text-[9px] text-white/25 ml-1 leading-snug">
+                Pro chất lượng cao hơn nhưng chậm & tốn quota hơn.
+              </span>
             </div>
           </div>
         </div>

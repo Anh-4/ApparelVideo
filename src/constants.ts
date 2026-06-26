@@ -59,8 +59,15 @@ export function buildVideoPrompt(opts: {
     // 3) Hành động / bối cảnh theo phong cách
     `Action: the model is ${scene}`,
     // 4) NGUYÊN TẮC DUY NHẤT: giữ nguyên design mặt trước & sau; còn lại AI tự do sáng tạo
-    'Most important rule: the featured garment design must exactly match the reference images — keep the FRONT and BACK artwork, prints, graphics, text, logos, colors and patterns identical, and do not change, add, remove, distort or recolor any design element. Everything else — the model, the rest of the outfit, pose, scenery and background — can be freely and creatively imagined and look natural, as long as the featured garment design stays faithful. The garment fits and drapes naturally and its print moves realistically with the fabric.',
+    'Most important rule: the featured garment design must exactly match the reference images — keep the FRONT and BACK artwork, prints, graphics, text, logos, colors and patterns identical, and do not change, add, remove, distort or recolor any design element. The printed graphics, text and logos stay crisp, sharp and perfectly legible throughout the entire clip — never warping, morphing, melting, flickering or becoming garbled as the model moves. Everything else — the model, the rest of the outfit, pose, scenery and background — can be freely and creatively imagined and look natural, as long as the featured garment design stays faithful. The garment fits and drapes naturally and its print moves realistically with the fabric.',
     // 5) Ánh sáng & màu: SÁNG, rõ, sống động nhưng vẫn tự nhiên
     'Bright, clean and well-exposed with abundant flattering light; vibrant yet true-to-life colors, accurate white balance, luminous natural lighting and soft gentle shadows, radiant healthy skin tones; crisp sharp focus, shallow depth of field, smooth steady camera. Avoid dark, murky, underexposed, dull or washed-out tones; no heavy filter, no oversaturation.'
   ].join(' ');
 }
+
+/**
+ * Negative prompt cho Veo — liệt kê thứ CẦN TRÁNH để tăng chất lượng & độ chân thực.
+ * Truyền vào parameters.negativePrompt (Veo 3.1). Tập trung: lỗi hay gặp khi sinh người + giữ design.
+ */
+export const VIDEO_NEGATIVE_PROMPT =
+  'blurry, low quality, low resolution, pixelated, grainy, noisy, distorted, deformed, warped garment, warped or garbled text, illegible logo, melting print, flickering design, mismatched artwork, wrong colors, extra limbs, extra fingers, deformed hands, mutated body, malformed face, plastic skin, cartoon, anime, illustration, CGI, 3D render, video game look, dark, underexposed, washed out, dull, oversaturated, heavy filter, watermark, text overlay, jpeg artifacts, jittery motion, stuttering, nudity, partially dressed, missing clothing';

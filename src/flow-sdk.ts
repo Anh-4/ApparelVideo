@@ -123,6 +123,7 @@ async function startVideoOp(opts: {
   key: string;
   aspectRatio?: string;
   durationSeconds?: number;
+  negativePrompt?: string;
   referenceImages?: Array<{ base64: string; mimeType: string }>;
 }): Promise<string> {
   const instance: any = { prompt: opts.prompt };
@@ -140,6 +141,7 @@ async function startVideoOp(opts: {
   const parameters: any = { personGeneration: 'allow_adult' };
   if (opts.aspectRatio) parameters.aspectRatio = opts.aspectRatio;
   if (opts.durationSeconds) parameters.durationSeconds = opts.durationSeconds;
+  if (opts.negativePrompt?.trim()) parameters.negativePrompt = opts.negativePrompt.trim();
   // Veo 3.1 chỉ cho durationSeconds = 8 khi có reference images -> ép 8 để tránh lỗi 400.
   if (refs.length) parameters.durationSeconds = 8;
 
@@ -226,6 +228,7 @@ export const Flow = {
       modelDisplayName?: string;
       aspectRatio?: string;
       durationSeconds?: number;
+      negativePrompt?: string;
       referenceImageMediaIds?: string[];
     }): Promise<MediaResult> => {
       const key = getApiKey();
@@ -247,6 +250,7 @@ export const Flow = {
         key,
         aspectRatio: opts.aspectRatio,
         durationSeconds: opts.durationSeconds,
+        negativePrompt: opts.negativePrompt,
         referenceImages,
       });
 

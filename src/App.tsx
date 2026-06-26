@@ -5,7 +5,7 @@ import { PreviewArea } from './components/PreviewArea';
 import { OptionsPanel } from './components/OptionsPanel';
 import { GlobalStyles } from './components/GlobalStyles';
 import { ApiKeyModal, hasApiKey } from './components/ApiKeyModal';
-import { STYLE_OPTIONS, buildVideoPrompt } from './constants';
+import { STYLE_OPTIONS, buildVideoPrompt, VIDEO_NEGATIVE_PROMPT } from './constants';
 
 export type VideoResult = { base64: string; mimeType: string; mediaId: string; style?: string };
 
@@ -16,6 +16,7 @@ export default function App() {
   const [category, setCategory] = useState('Áo polo');
   const [duration, setDuration] = useState('8s');
   const [aspectRatio, setAspectRatio] = useState<'9:16' | '16:9'>('9:16');
+  const [videoModel, setVideoModel] = useState('Omni Flash');
 
   const [selectedStyle, setSelectedStyle] = useState('Street Style');
   const [selectedModel, setSelectedModel] = useState('Người mẫu nữ');
@@ -69,9 +70,10 @@ export default function App() {
 
       const result = await Flow.generate.video({
         prompt,
-        modelDisplayName: 'Omni Flash',
+        modelDisplayName: videoModel,
         aspectRatio,
         durationSeconds: selectedDuration,
+        negativePrompt: VIDEO_NEGATIVE_PROMPT,
         referenceImageMediaIds: referenceIds,
       });
 
@@ -109,9 +111,10 @@ export default function App() {
 
           const result = await Flow.generate.video({
             prompt,
-            modelDisplayName: 'Omni Flash',
+            modelDisplayName: videoModel,
             aspectRatio,
             durationSeconds: selectedDuration,
+            negativePrompt: VIDEO_NEGATIVE_PROMPT,
             referenceImageMediaIds: referenceIds,
           });
 
@@ -158,6 +161,8 @@ export default function App() {
         setDuration={setDuration}
         aspectRatio={aspectRatio}
         setAspectRatio={setAspectRatio}
+        videoModel={videoModel}
+        setVideoModel={setVideoModel}
         onGenerate={handleGenerate}
         onGenerateCombo={handleGenerateCombo}
         isGenerating={isGenerating}
